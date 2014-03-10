@@ -43,7 +43,7 @@ public final class VmFrame {
 	}
 
 	// Don't implement the initialization of this class in the constructor to re-use this instance
-	void init(final Method method) {
+	void init(final VmMethod method) {
 		init(method, false);
 	}
 

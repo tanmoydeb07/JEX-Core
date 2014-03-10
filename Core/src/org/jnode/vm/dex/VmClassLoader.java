@@ -6,7 +6,7 @@ package org.jnode.vm.dex;
 
 import java.util.Hashtable;
 
-final class VmClassLoader {
+public final class VmClassLoader {
 	private static final int ACC_private = 0x1;
 	private static final int ACC_PRIVATE = 0x2;
 	private static final int ACC_PROTECTED = 0x4;
@@ -46,18 +46,18 @@ final class VmClassLoader {
 	private static final int VALUE_BOOLEAN = 0x1f;
 
 	//private final VirtualMachine vm;
-	//private final Thread loadThread;
+	private final Thread loadThread = null;
 	private final Hashtable classes = new Hashtable();
 
-	VmClassLoader(/*final VirtualMachine vm*/) {
+	public VmClassLoader(/*final VirtualMachine vm*/) {
 		//this.vm = vm;
 		//loadThread = new Thread(vm, "Class Loader");
 	}
 
-	Clazz loadClass(final String name) {
-		Clazz clazz;
+	VmClass loadClass(final String name) {
+		VmClass clazz;
 		if (classes.containsKey(name)) {
-			clazz = (Clazz)classes.get(name);
+			clazz = (VmClass)classes.get(name);
 		} else {
 			clazz = findClass(name);
 			if (clazz == null) {
@@ -67,9 +67,9 @@ final class VmClassLoader {
 		}
 		if (!clazz.binded) {
 			clazz.binded = true;
-			Method clinit = clazz.getDirectMethod("<clinit>", "()V");
+			VmMethod clinit = clazz.getDirectMethod("<clinit>", "()V");
 			if (clinit != null) {
-				Frame frame = loadThread.pushFrame();
+				VmFrame frame = loadThread.pushFrame();
 				frame.init(clinit);
 				try {
 					loadThread.execute(true);
@@ -83,7 +83,7 @@ final class VmClassLoader {
 		return clazz;
 	}
 
-	protected Clazz findClass(final String name) {
+	protected VmClass findClass(final String name) {
 		return null;
 	}
 
@@ -139,7 +139,7 @@ final class VmClassLoader {
 		if (offset != 0) {
 			pushOffset(offset);
 			for (int i = 0; i < count; i++) {
-				Clazz clazz = new Clazz(this);
+				VmClass clazz = new VmClass(this);
 
 				clazz.name = fromTypeToClassName(types[readUInt()]);
 
@@ -172,10 +172,10 @@ final class VmClassLoader {
 				if (classDataOffset != 0) {
 					pushOffset(classDataOffset);
 
-					Field[] staticFields = new Field[readULEB128()];
-					Field[] instanceFields = new Field[readULEB128()];
-					Method[] directMethods = new Method[readULEB128()];
-					Method[] virtualMethods = new Method[readULEB128()];
+					VmField[] staticFields = new VmField[readULEB128()];
+					VmField[] instanceFields = new VmField[readULEB128()];
+					VmMethod[] directMethods = new VmMethod[readULEB128()];
+					VmMethod[] virtualMethods = new VmMethod[readULEB128()];
 
 					readFields(clazz, staticFields, false);
 					readFields(clazz, instanceFields, true);
@@ -185,7 +185,7 @@ final class VmClassLoader {
 					clazz.staticFields = staticFields;
 					clazz.staticFieldMap = new Hashtable();
 					for (int j = 0; j < staticFields.length; j++) {
-						Field field = staticFields[j];
+						VmField field = staticFields[j];
 						clazz.staticFieldMap.put(field.name, field);
 					}
 					clazz.instanceFields = instanceFields;
@@ -201,7 +201,7 @@ final class VmClassLoader {
 
 					int length = readULEB128();
 					for (int j = 0; j < length; j++) {
-						Field staticField = clazz.staticFields[j];
+						VmField staticField = clazz.staticFields[j];
 
 						int data = readUByte();
 						int valueType = data & 0x1F;
@@ -256,7 +256,7 @@ final class VmClassLoader {
 		return value == -1;
 	}
 
-	private void readMethodContents(final Clazz clazz, final Method[] methods) {
+	private void readMethodContents(final VmClass clazz, final VmMethod[] methods) {
 		int methodIndex = 0;
 		for (int i = 0, length = methods.length; i < length; i++) {
 			if (i == 0) {
@@ -264,7 +264,7 @@ final class VmClassLoader {
 			} else {
 				methodIndex += readULEB128();
 			}
-			Method method = new Method(clazz);
+			VmMethod method = new VmMethod(clazz);
 
 			method.strings = strings;
 			method.types = types;
@@ -362,7 +362,7 @@ final class VmClassLoader {
 		return slashSeparatorClassName.substring(1, slashSeparatorClassName.length() - 1).replace('/', '.');
 	}
 
-	private void readFields(final Clazz clazz, final Field[] fields, final boolean isInstance) {
+	private void readFields(final VmClass clazz, final VmField[] fields, final boolean isInstance) {
 		int fieldIndex = 0;
 		for (int i = 0, length = fields.length; i < length; i++) {
 			if (i == 0) {
@@ -370,7 +370,7 @@ final class VmClassLoader {
 			} else {
 				fieldIndex += readULEB128();
 			}
-			Field field = new Field(clazz);
+			VmField field = new VmField(clazz);
 
 			field.flag = readULEB128();
 			field.isInstance = isInstance;
