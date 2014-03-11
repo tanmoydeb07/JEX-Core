@@ -12,36 +12,46 @@ import org.jnode.vm.dex.compiler.DexVisitor;
 
 /**
  *
- * @author TONGO
- * Actual converter from Dex to x86 binary
+ * @author TONGO Actual converter from Dex to x86 binary
  */
-public class X86DexVisitor extends DexVisitor{
-    
+public class X86DexVisitor extends DexVisitor {
+
     /**
      * The output stream
      */
     private X86Assembler os;
-    
     /**
      * The method currently being compiled
      */
     private VmMethod currentMethod;
-    
     /**
      * Class loader
      */
     private VmClassLoader loader;
-    
-    //private DexParser parser;
 
+    //private DexParser parser;
     @Override
     public void setParser(DexParser parser) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    /**
+     * No operaation
+     */
+    @Override
+    public void visit_nop() {
+        os.writeNOP();
+    }
+
+    /**
+     * for move, move-object, long-to-int 
+     * op vA, vB
+     * A: destination register (4 bits)
+     * B: source register (4 bits)
+     */
     @Override
     public void visit_move() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        //
     }
 
     @Override
@@ -728,6 +738,4 @@ public class X86DexVisitor extends DexVisitor{
     public void visit_range() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-
-
 }

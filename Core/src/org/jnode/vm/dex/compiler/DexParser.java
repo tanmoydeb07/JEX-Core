@@ -116,7 +116,35 @@ public class DexParser {
             //counters[ opcode]++;
             switch (opcode) {
                 case 0x00: //nope
-                    
+                    handler.visit_nop();
+                    break;
+                case 0x01:
+                    handler.visit_move();
+                    break;
+                case 0x02:
+                    handler.visit_move_16();
+                    break;
+                case 0x03:
+                    handler.visit_move_from16();
+                    break;
+                case 0x04:
+                    handler.visit_move_wide();
+                    break;
+                case 0x05:
+                    handler.visit_move_wide_from16();
+                    break;
+                case 0x06:
+                    handler.visit_move_wide_16();
+                    break;
+                case 0x07:
+                    handler.visit_move_object();
+                    break;
+                case 0x08:
+                    handler.visit_move_object_from16();
+                    break;
+                case 0x09:
+                    //handler.visit_move_object_16();
+                    break;            
                 
             }
         }

@@ -12,7 +12,15 @@ public abstract class DexVisitor {
 
     public abstract void setParser(DexParser parser);
 
+    public abstract void visit_nop();
+
     public abstract void visit_move();
+
+    public abstract void visit_move_16();
+    
+    public abstract void visit_move_wide_from16();
+    
+     public abstract void visit_move_wide_16();
 
     public abstract void visit_move_from16();
 
